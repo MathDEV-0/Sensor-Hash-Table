@@ -3,7 +3,7 @@
 #include "hashTableDS.h"
 #include "sensor.h"
 
-#define BUFFER_SIZE 6
+#define BUFFER_SIZE 7
 
 class HashTable: public HashTableDS<Sensor>{
     private:

@@ -19,27 +19,30 @@ HashTable::HashTable(){
 */
 void HashTable::insert(Sensor& sensor){
     
-    int key = sensor.getId();
-
+    int key = sensor.getId(); //A chave é baseada no ID do objeto
+    if (key < 0) {
+        std::cout << "Error: cannot insert sensor with negative id"<<std::endl;
+        return;
+    }
     // K%M & 1 + (K % (M-1)) = double hash
     int hash1 = key % M; int hash2 = 1 + (key % (M-1));
 
-    for(int i =0; i< BUFFER_SIZE;i++){
-        int index = (hash1 + i * hash2) % M;
+    for(int i =0; i< BUFFER_SIZE;i++){ //Anda em i, calculando double hash
+        int index = (hash1 + i * hash2) % M; //Cálculo de busca de índice baseado na função hash 
         std::cout<<std::endl;
         std::cout<<"Trying to insert "<< key<<" at index ["<<index<<"]"<<std::endl;
-        if(data[index] == nullptr || data[index] == REMOVED){
+        if(data[index] == nullptr || data[index] == REMOVED){ //Se há espaços disponíveis, insere
             data[index] = new Sensor(sensor);
             std::cout<<"Successfully inserted key "<<key<<" at index ["<<index<<"]"<<std::endl;
             return;
         }
-        if (data[index]->getId() == key){
+        if (data[index]->getId() == key){ //Se não, é duplicata (já há outro id com sensor disponível)
             std::cout<<"There is a sensor with same ID"<<std::endl;
             return;
         }
-        number_of_colisions++;
-    }
-    std::cout<<"Hash Table is full!"<<std::endl;
+        if(data[index] != nullptr && data[index] != REMOVED) number_of_colisions++; //Se não, contamos como colisão e prosseguimos
+    } 
+    std::cout<<"Hash Table is full!"<<std::endl; //Se a condição não for satisfeita, a tabela está cheia
     std::cout<<std::endl;
 }
 
@@ -54,10 +57,10 @@ Sensor* HashTable::search(int key){
     // K%M & 1 + (K % (M-1)) = double hash
     int hash1 = key % M; int hash2 = 1 + (key % (M-1));
     std::cout<<std::endl;
-    for(int i =0; i< BUFFER_SIZE;i++){
-        int index = (hash1 + i * hash2) % M;
+    for(int i =0; i< BUFFER_SIZE;i++){ //Anda em i, calculando double hash
+        int index = (hash1 + i * hash2) % M;//Cálculo de busca de índice baseado na função hash 
         std::cout<<"Searching "<< key<<" at index ["<<index<<"]"<<std::endl;
-        if(data[index] == nullptr){
+        if(data[index] == nullptr){ //Se nullptr, significa que realmente há um espaço vazio
             std::cout<<"Element with key "<<key<<" doesn't exist at the calculated index ["<<index<<"]"<<std::endl;
             return nullptr;
         }
@@ -140,4 +143,13 @@ int HashTable::getFreeSpaces(){
         }
     }
     return availableSpaces;
+}
+
+void HashTable::updateAllLastReadings() {
+    for(int i = 0; i < BUFFER_SIZE; i++) {
+        if(data[i] != nullptr && data[i] != REMOVED) {
+            double value = (rand() % 1000) / 10.0;
+            data[i]->setLastRead(value);
+        }
+    }
 }

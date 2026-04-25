@@ -7,6 +7,7 @@
 
 /*
     Hash Estático Fechado
+    Endereçamento aberto: double hashing
     Tamanho de M definido na constante BUFFER_SIZE = 10037, valor escolhido devido a seu fator de primo
     Herda de um TAD genérico e implementa T como Sensor
 */
@@ -22,6 +23,7 @@ class HashTable: public HashTableDS<Sensor>{
         int getNumberOfColisions();
         int getFreeSpaces();
         void printHashTable();
+        void updateAllLastReadings();
 };
 
 #endif

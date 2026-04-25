@@ -114,6 +114,15 @@ int main(int argc, char* argv[]){
                 auto endTime = std::chrono::high_resolution_clock::now();
                 std::chrono::duration<double> totalTime = endTime - startTime;
                 std::cout <<inserted<<" insertion sensor time (sec): " << totalTime.count() << std::endl;
+                break;
+            }
+            case 7:{
+                auto startTime = std::chrono::high_resolution_clock::now();
+                ht.updateAllLastReadings();
+                auto endTime = std::chrono::high_resolution_clock::now();
+                std::chrono::duration<double> totalTime = endTime - startTime;
+                std::cout <<"Update every sensor read time (sec): " << totalTime.count() << std::endl;
+                break;
             }
             case 0:
                 std::cout <<std::endl;    
@@ -139,6 +148,7 @@ void showMenu() { // Função para exibir o menu de opções
     std::cout << "4 - Remove single sensor"<<std::endl;
     std::cout << "5 - Show sensors"<<std::endl;
     std::cout << "6 - Insert 1000 sensors automatically"<<std::endl;
+    std::cout << "7 - Update read for all sensors"<<std::endl;
     std::cout << "0 - Exit"<<std::endl;
     std::cout << "Enter an option:"<<std::endl;
    std::cout<<std::endl;
@@ -153,6 +163,7 @@ void showStatistics(HashTable ht){
 /*
     Insere 1000 sensores automaticamente
     Assegura que o id de todos é positivo (unsigned)
+    Assegura que não há duplicata (a função insere garante que não haverá duplicatas, mas não garante inserção - a função gera aleatoriamente até poder inserir)
 */
 int tryInsert1000(HashTable& ht){
     srand(time(NULL));
@@ -161,31 +172,45 @@ int tryInsert1000(HashTable& ht){
         std::cout << "Hash table is full!" << std::endl;
         return 0;
     }
-     if(ht.getFreeSpaces() < 1000){
+
+    if(ht.getFreeSpaces() < 1000){
         std::cout << "Only " << ht.getFreeSpaces() << " free spaces." << std::endl;
         std::cout << "Will insert " << ht.getFreeSpaces() << " sensors instead of 1000." << std::endl;
     }
 
+    //Mock localização e tipos possíveis
+    std::string types[] = {
+        "temperature_indicator", "humidity_indicator", "ph_indicator", "nutrients_indicator", "pressure_indicator"
+    };
+    std::string locations[] = {
+        "Porto Alegre", "Sao Leopoldo", "Novo Hamburgo",
+        "Pelotas", "Viamao", "Gravatai"
+    };
+
+    int numTypes = sizeof(types) / sizeof(types[0]);
+    int numLocations = sizeof(locations) / sizeof(locations[0]);
+
     int inserted = 0;
-    int limit = 0; 
-    if(ht.getFreeSpaces() < 1000){
-        limit = ht.getFreeSpaces();
-    }else{
-        limit = 1000;
-    }
+    int limit = (ht.getFreeSpaces() < 1000) ? ht.getFreeSpaces() : 1000;
+
     for (int i = 0; i < limit; i++) {
-        unsigned short int id = rand() % 100000 + 1; 
+        unsigned short int id = rand() % 65535 + 1;
 
         while (ht.search(id) != nullptr) {
-            id = rand() % 100000 + 1;
+            id = rand() % 65535 + 1;
         }
 
-        Sensor s(id, "auto_generated", "generated_location");
+
+        std::string type = types[rand() % numTypes];
+        std::string location = locations[rand() % numLocations];
+
+        Sensor s(id, type, location);
         ht.insert(s);
         inserted++;
     }
 
     std::cout << inserted << " inserted!" << std::endl;
     std::cout << "Collisions: " << ht.getNumberOfColisions() << std::endl;
+
     return inserted;
 }

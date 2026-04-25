@@ -2,6 +2,10 @@
 #define SENSOR_H
 #include <iostream>
 #include <string>
+/*
+    Classe sensor
+    Contempla id's de até 16 bits
+*/
 class Sensor{
     private:
         short int id;

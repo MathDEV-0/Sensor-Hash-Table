@@ -3,8 +3,13 @@
 #include "hashTableDS.h"
 #include "sensor.h"
 
-#define BUFFER_SIZE 7
+#define BUFFER_SIZE 10037
 
+/*
+    Hash Estático Fechado
+    Tamanho de M definido na constante BUFFER_SIZE = 10037, valor escolhido devido a seu fator de primo
+    Herda de um TAD genérico e implementa T como Sensor
+*/
 class HashTable: public HashTableDS<Sensor>{
     private:
         Sensor* data[BUFFER_SIZE];
@@ -15,7 +20,8 @@ class HashTable: public HashTableDS<Sensor>{
         Sensor* search(int key) override;
         void _delete(int key) override;
         int getNumberOfColisions();
-
+        int getFreeSpaces();
+        void printHashTable();
 };
 
 #endif
